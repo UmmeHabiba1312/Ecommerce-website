@@ -1,13 +1,13 @@
 "use client"; // Mark this as a Client Component
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Address, CartItem } from '@/utils/types';
 import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { FaSpinner } from 'react-icons/fa';
-import countries from 'country-list'; // Ensure this library is installed
+import countries from 'country-list';
 
 // Load Stripe.js
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -40,7 +40,7 @@ const CheckoutForm = ({
     setError('');
 
     try {
-      // Step 1: Create a payment intent on the server
+      // Step 1: Create a payment intent on the client side
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,13 +177,12 @@ const CheckoutForm = ({
   );
 };
 
-export default function CheckOut() {
+function CheckoutPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const cart = searchParams.get('cart') || '[]'; // Default to '[]' if cart is null
+  const cart = searchParams.get('cart') || '[]';
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Parse the cart parameter on the client side
   useEffect(() => {
     try {
       setCartItems(JSON.parse(cart));
@@ -202,11 +201,6 @@ export default function CheckOut() {
     country: 'US',
   });
   const [email, setEmail] = useState('');
-
-  // Ensure Stripe.js is loaded before rendering the form
-  if (!stripePromise) {
-    return <div>Loading Stripe...</div>;
-  }
 
   return (
     <div className="p-4 max-w-4xl mx-auto">
@@ -255,7 +249,13 @@ export default function CheckOut() {
   );
 }
 
-
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CheckoutPageContent />
+    </Suspense>
+  );
+}
 
 
 
