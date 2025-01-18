@@ -354,106 +354,56 @@
 // }
 
 // export default Product
-
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { FiShoppingCart } from 'react-icons/fi';
 import { client } from '@/sanity/lib/client';
 import Link from 'next/link';
 
 type simplifiedProduct = {
-    _id: string;
-    name: string;
-    description: string;
-    price: number;
-    price_id: string;
-    stock: number;
-    slug: string;
-    image: {
-      _key: string;
-      asset: {
-        _id: string;
-        url: string;
-      };
-    }[];
-  };
-async function getData() {
-const query = `*[_type == "product"] {
-  _id,
-  name,
-  description,
-  price,
-  price_id,
-  stock,
-  "slug": slug.current,
-  image[] {
-    _key,
-    asset-> {
-      _id,
-      url
-    }
-  }
-}`;
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  price_id: string;
+  stock: number;
+  slug: string;
+  image: {
+    _key: string;
+    asset: {
+      _id: string;
+      url: string;
+    };
+  }[];
+};
 
-const data = await client.fetch(query);
-return data;
+async function getData() {
+  const query = `*[_type == "product"] {
+    _id,
+    name,
+    description,
+    price,
+    price_id,
+    stock,
+    "slug": slug.current,
+    image[] {
+      _key,
+      asset-> {
+        _id,
+        url
+      }
+    }
+  }`;
+
+  const data = await client.fetch(query);
+  return data;
 }
 
+const Product = async () => {
+  const data: simplifiedProduct[] = await getData();
 
-const Product = async() => {
-  const data:simplifiedProduct[] = await getData();
-  console.log(data);
-  
-  // const { addToCart } = useCart();  // Get the addToCart function from context
-  // const router = useRouter();
-
-  // // Updated product data with consistent structure
-  // const products: Product[] = [
-  //   {
-  //     id: 1,
-  //     src: '/product1.png',
-  //     title: 'Library Stool Chair',
-  //     price: '20$',
-  //     badge: 'New',
-  //     badgeColor: '#01AD5A',
-  //     description: 'A comfortable and stylish library stool chair.',
-  //   },
-  //   {
-  //     id: 2,
-  //     src: '/product2.png',
-  //     title: 'Library Stool Chair',
-  //     price: '20$',
-  //     oldPrice: '25$',
-  //     badge: 'Sales',
-  //     badgeColor: '#F5813F',
-  //     description: 'A comfortable and stylish library stool chair.',
-  //   },
-  //   {
-  //     id: 3,
-  //     src: '/product3.png',
-  //     title: 'Library Stool Chair',
-  //     price: '20$',
-  //     description: 'A comfortable and stylish library stool chair.',
-  //   },
-  //   {
-  //     id: 4,
-  //     src: '/product4.png',
-  //     title: 'Library Stool Chair',
-  //     price: '20$',
-  //     description: 'A comfortable and stylish library stool chair.',
-  //   },
-  // ];
-
-  // const handleProductClick = (product: Product) => {
-  //   router.push(
-  //     `/extrapages/${product.id}?title=${encodeURIComponent(
-  //       product.title
-  //     )}&price=${encodeURIComponent(product.price)}&image=${encodeURIComponent(
-  //       product.src
-  //     )}&description=${encodeURIComponent(product.description ?? 'No description available')}`
-  //   );
-  // };
+  // Debugging: Log the data to inspect its structure
+  console.log(JSON.stringify(data, null, 2));
 
   return (
     <>
@@ -464,7 +414,11 @@ const Product = async() => {
 
         {/* Products Grid */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-[35px] mt-[30px]">
-  {data.map((product, index) => (
+        {data.map((product, index) => {
+  // Filter out images with null assets
+  const validImages = product.image.filter(img => img.asset !== null);
+
+  return (
     <div
       key={product._id}
       className="group overflow-hidden rounded-[6px] bg-white sm:mt-8 md:mt-12 transition-all duration-300"
@@ -472,30 +426,30 @@ const Product = async() => {
       <div className="relative w-full h-[auto] sm:h-[250px] flex justify-center items-center">
         {/* Conditional Rendering for Buttons */}
         {[0, 4, 8].includes(index) && ( // Green button for indexes 1, 5, and 9
-  <button
-    className="absolute left-2 top-2 text-white px-4 py-2 rounded-[4px] text-sm bg-[#01AD5A]"
-  >
-    New
-  </button>
-)}
+          <button
+            className="absolute left-2 top-2 text-white px-4 py-2 rounded-[4px] text-sm bg-[#01AD5A]"
+          >
+            New
+          </button>
+        )}
 
-{[1, 5, 9].includes(index) && ( // Orange button for indexes 2, 6, and 10
-  <button
-    className="absolute left-2 top-2 text-white px-4 py-2 rounded-[4px] text-sm bg-[#F5813F]"
-  >
-    Sales
-  </button>
-)}
+        {[1, 5, 9].includes(index) && ( // Orange button for indexes 2, 6, and 10
+          <button
+            className="absolute left-2 top-2 text-white px-4 py-2 rounded-[4px] text-sm bg-[#F5813F]"
+          >
+            Sales
+          </button>
+        )}
 
-
-{product.image && product.image.length > 0 ? (
-  <Image
-    className="w-full sm:h-[250px] h-[300px] object-cover rounded-[6px]"
-    height={250}
-    width={250}
-    src={product.image[0].asset.url} // Use the first image in the array
-    alt={product.name}
-  />
+        {/* Image */}
+        {validImages.length > 0 ? (
+          <Image
+            className="w-full sm:h-[250px] h-[300px] object-cover rounded-[6px]"
+            height={250}
+            width={250}
+            src={validImages[0].asset.url} // Use the first valid image
+            alt={product.name}
+          />
         ) : (
           <div className="w-full sm:h-[250px] h-[300px] bg-gray-200 rounded-[6px] flex items-center justify-center">
             <span className="text-gray-500">No Image Available</span>
@@ -507,7 +461,7 @@ const Product = async() => {
         <div>
           {/* Product Name */}
           <div className="text-black text-[16px] font-medium group-hover:text-[#007580]">
-           <Link href={`/extrapages/${product.slug}`}> {product.name}</Link>
+            <Link href={`/extrapages/${product.slug}`}>{product.name}</Link>
           </div>
 
           {/* Price Section */}
@@ -533,8 +487,9 @@ const Product = async() => {
         </div>
       </div>
     </div>
-  ))}
-</div>
+  );
+})}
+        </div>
       </main>
     </>
   );
