@@ -5,15 +5,16 @@ import { Button } from './ui/button';
 import { useShoppingCart } from 'use-shopping-cart';
 import { FiShoppingCart } from 'react-icons/fi';
 import { urlFor } from '@/sanity/lib/image';
-import { useRouter } from 'next/navigation'; // Import useRouter
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 export interface ProductCart {
   name: string;
   description: string;
   price: number;
-  image: any; // Sanity image object
+  image: any;
   currency: string;
-  id: string; // Unique identifier for the product
+  id: string;
   price_id?: string;
 }
 
@@ -27,33 +28,40 @@ const AddToCart = ({
   price_id,
 }: ProductCart) => {
   const { cartDetails, addItem, setItemQuantity } = useShoppingCart();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
-  // Prepare the product object for the cart
   const product = {
-    id, // Unique identifier for the product
+    id,
     name,
     description,
     price,
-    image: image ? urlFor(image).url() : '', // Use urlFor to get the image URL
+    image: image ? urlFor(image).url() : '',
     currency,
     price_id,
   };
 
   const handleAddToCart = () => {
-    // Check if the item already exists in the cart
-    const existingItem = cartDetails?.[id];
+    try {
+      const existingItem = cartDetails?.[id];
 
-    if (existingItem) {
-      // Increment the quantity if it exists
-      setItemQuantity(id, existingItem.quantity + 1);
-    } else {
-      // Add a new item if it doesn't exist
-      addItem(product);
+      if (existingItem) {
+        setItemQuantity(id, existingItem.quantity + 1);
+        console.log('Item quantity updated:', name); // Debugging
+        toast.success(`${name} quantity updated in cart!`);
+      } else {
+        addItem(product);
+        console.log('Item added to cart:', name); // Debugging
+        toast.success(`${name} added to cart successfully!`);
+      }
+
+      // Delay the redirect to allow the toast to display
+      setTimeout(() => {
+        router.push('/cart');
+      }, 1000); // 1-second delay
+    } catch (error) {
+      console.error('Error adding to cart:', error); // Debugging
+      toast.error('Failed to add item to cart. Please try again.');
     }
-
-    // Redirect to the cart page
-    router.push('/cart'); // Use router.push to navigate to the cart page
   };
 
   return (

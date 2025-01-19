@@ -196,63 +196,94 @@
 //   )
 // }
 
+'use client'; // Add this to make it a client-side component
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { client } from '@/sanity/lib/client';
 import ImageGallery from '@/components/ImageGallery';
 import AddToCart from '@/components/AddToCart';
+import ReviewForm from '@/components/Reviews';
+import { FaStar } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
 
 // Define the FullProduct interface
 interface FullProduct {
-    _id: string;
-    name: string;
-    description: string;
-    price: number;
-    price_id: string;
-    stock: number;
-    slug: string;
-    image: {
-      _key: string;
-      asset: {
-        _id: string;
-        url: string;
-      };
-    }[];
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  price_id: string;
+  stock: number;
+  slug: string;
+  image: {
+    _key: string;
+    asset: {
+      _id: string;
+      url: string;
+    };
+  }[];
+  reviews?: Review[]; // Use the Review interface here
 }
 
-// Fetch product data based on the slug
-async function getData(slug: string): Promise<FullProduct | null> {
-  const query = `*[_type == "product" && slug.current == $slug][0]{
-  _id,
-  name,
-  description,
-  price,
-  price_id,
-  stock,
-  "slug": slug.current,
-  image[] {
-    _key,
-    asset-> {
+// Define the Review interface
+interface Review {
+  _id: string;
+  name: string;
+  rating: number;
+  comment: string;
+  _createdAt: string;
+}
+
+export default function Page({ params }: { params: { slug: string } }) {
+  const [data, setData] = useState<FullProduct | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]); // Properly type the reviews array
+
+  // Fetch product data and reviews
+  const fetchData = async () => {
+    const query = `*[_type == "product" && slug.current == $slug][0]{
       _id,
-      url
-    }
-  }
-}`;
+      name,
+      description,
+      price,
+      price_id,
+      stock,
+      "slug": slug.current,
+      image[] {
+        _key,
+        asset-> {
+          _id,
+          url
+        }
+      },
+      "reviews": *[_type == "review" && product._ref == ^._id] {
+        _id,
+        name,
+        rating,
+        comment,
+        _createdAt
+      }
+    }`;
 
-  const data = await client.fetch(query, { slug });
-  return data;
-}
+    const productData = await client.fetch(query, { slug: params.slug });
+    setData(productData);
+    setReviews(productData.reviews || []);
+  };
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  // Fetch product data
-  const data: FullProduct | null = await getData(params.slug);
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchData();
+  }, [params.slug]);
 
   // If product not found, display a message
   if (!data) {
     return <div>Product not found</div>;
   }
 
-  console.log('Product Data:', data); // Log the fetched data
+  // Handle new review submission
+  const handleReviewSubmit = () => {
+    fetchData(); // Re-fetch reviews after submission
+  };
 
   return (
     <main className="max-w-screen-2xl mx-auto h-auto w-full mb-[80px] px-8">
@@ -262,15 +293,16 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <ImageGallery Images={data.image || []} />
 
         {/* Product Information */}
-        <div className="two h-auto flex-1 lg:pl-[80px] pl-[6px] pt-[80px] lg:pt-14">
+        <div className="two h-auto flex-1 lg:pl-[80px] pl-[6px] pt-[80px] lg:pt-12">
           <h2 className="text-[#272343] text-[40px] sm:text-[60px] leading-[70px] font-bold">
             {data.name}
           </h2>
+          <p className='mt-1  font-bold  text-[#544e81]'>Availability : <span className='text-[#029FAE] font-semibold'> In Stock ( {data.stock} available )</span></p>
           <button className="h-[44px] w-[144px] bg-[#029FAE] rounded-full text-white mt-[40px]">
             {data.price}$
           </button>
           <hr className="mt-[30px]" />
-          <p className="text-[22px] leading-[33px] text-[#272343] mt-[60px]">
+          <p className="text-[22px] leading-[33px] text-[#272343] mt-[20px]">
             {data.description}
           </p>
 
@@ -286,6 +318,33 @@ export default async function Page({ params }: { params: { slug: string } }) {
             image={data.image && data.image.length > 0 ? data.image[0] : null}
           />
         </div>
+      </div>
+
+      {/* Review Form */}
+      <ReviewForm id={data._id} onReviewSubmit={handleReviewSubmit} />
+      <hr className="mt-14" />
+
+      {/* Display Reviews */}
+      <div className="mt-6">
+        <h3 className="text-3xl text-[#272343] font-bold mb-4">Customer Reviews</h3>
+        {reviews.length > 0 ? (
+          reviews.map((review) => (
+            <div key={review._id} className="mb-4">
+              <div className="flex items-center">
+                <span className="font-bold">{review.name}</span>
+                <span className="ml-3 text-yellow-500 flex items-center gap-2">
+                  <FaStar />({review.rating})
+                </span>
+              </div>
+              <p className="text-gray-700">{review.comment}</p>
+              <p className="text-sm text-gray-500">
+                {new Date(review._createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          ))
+        ) : (
+          <p className='mb-14'>No reviews yet. Be the first to leave one!</p>
+        )}
       </div>
 
       {/* Featured Products Section */}

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { FiCheckCircle } from 'react-icons/fi';
 
 export default function ThankYou() {
   const [showShippingForm, setShowShippingForm] = useState(false);
@@ -176,7 +177,8 @@ export default function ThankYou() {
 
   return (
     <div className="p-4 text-center">
-      <h1 className="text-2xl font-bold mb-4">Payment Successful!</h1>
+      <h1 className="text-4xl font-bold mb-4 ">Payment Successful!</h1>
+      <span className='text-center flex justify-center mt-2'><FiCheckCircle className='text-green-500  text-7xl' /></span>
       <p className="text-lg text-gray-600">
         Thank you for your purchase. Your payment has been processed successfully.
       </p>
@@ -186,7 +188,7 @@ export default function ThankYou() {
         <button
           onClick={handleGenerateTrackingNumber}
           disabled={showShippingForm}
-          className="bg-[#029FAE] text-white font-semibold py-2 px-4 rounded-[30px] hover:bg-[#272343] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-[#029FAE] text-white font-semibold py-4 mb-4 px-4  rounded-[30px] hover:bg-[#272343] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Generate Tracking Number!
         </button>
@@ -330,8 +332,8 @@ export default function ThankYou() {
 
       {/* Display Tracking Details */}
       {trackingNumber && (
-        <div className="mt-6 max-w-md mx-auto text-left">
-          <h2 className="text-xl font-bold mb-4">Tracking Details</h2>
+        <div className="mt-14 max-w-md mx-auto text-left">
+          <h2 className="text-3xl font-bold mb-4">Tracking Details</h2>
           <div className="space-y-4">
             <p>
               <span className="font-semibold">Tracking Number:</span> {trackingNumber}

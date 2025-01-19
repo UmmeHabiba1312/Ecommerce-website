@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CartProvider from "@/components/Provider";
+import { ToastContainer } from 'react-toastify'; // Import ToastContainer
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,8 +27,10 @@ export default function RootLayout({
           <Header />
           <main className="max-w-screen-2xl mx-auto">{children}</main>
           <Footer />
+          {/* Add ToastContainer here */}
+          <ToastContainer />
         </CartProvider>
-        </body>
+      </body>
     </html>
   );
 }
