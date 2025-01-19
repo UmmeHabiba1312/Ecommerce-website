@@ -94,7 +94,7 @@ const Footer = () => {
       {/* Footer Bottom Section */}
       <div className="flex flex-col md:flex-row justify-between items-center text-sm px-4 py-4">
         <p>
-        @ 2021 - Blogy - Designed & Develop by <span className="font-bold">Zakirsoft</span>
+        @ 2021 - Blogy - Designed & Develop by <span className="font-bold">Umm e Habiba</span>
         </p>
         <Image
         className='h-[27px] w-[227px] object-cover'
