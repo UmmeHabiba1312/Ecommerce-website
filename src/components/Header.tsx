@@ -66,7 +66,7 @@ const Header = (props: any) => {
           {/* Additional Links */}
           <div><Link href='/faqs'>Faqs</Link></div>
           <div className="flex items-center gap-[6px]">
-            <BsExclamationCircle /> Need Help
+           <Link href="/help" className='flex items-center gap-1'> <BsExclamationCircle /> Need Help</Link>
           </div>
         </div>
       </div>
@@ -147,7 +147,7 @@ const Header = (props: any) => {
         {/* Contact Info */}
         <div className="flex h-[15px] w-auto gap-[8px] leading-[15px] text-[14px]">
           <span className="text-[#636270]"><Link href='/contact'>Contact:</Link></span>
-          <span className="text-[#272343]">{`(808) 555-0111`}</span>
+          <span className="text-[#272343]">{`0307-2502073`}</span>
         </div>
       </div>
     </main>
