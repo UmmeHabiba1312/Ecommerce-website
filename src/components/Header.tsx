@@ -98,10 +98,13 @@ const Header = (props: any) => {
 
           {/* Sign In Button */}
           <SignedOut>
-  <SignInButton className=" text-[#272343]  hover:text-[#007580]  flex items-center justify-center w-[25px] h-[25px]">
-    <FaRegUser className="text-1xl" />
-  </SignInButton>
+  <div className="bg-white p-2 text-[#272343] border-[1px] hover:text-white rounded-full hover:bg-[#007580]">
+    <SignInButton>
+      <FaRegUser className='text-xl'/>
+    </SignInButton>
+  </div>
 </SignedOut>
+
 
 
           {/* User Button when Signed In */}
