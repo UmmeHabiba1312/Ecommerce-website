@@ -7,7 +7,14 @@ import CartProvider from "@/components/Provider";
 import { ToastContainer } from 'react-toastify'; // Import ToastContainer
 import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
 import Script from 'next/script'; // Import Script component from Next.js
-
+// import { ClerkProvider } from "@clerk/nextjs";
+import {
+  ClerkProvider,
+  // SignInButton,
+  // SignedIn,
+  // SignedOut,
+  // UserButton
+} from '@clerk/nextjs'
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -21,9 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ClerkProvider>
     <html lang="en">
       <body className={inter.className}>
-        
+      {/* <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn> */}
         <CartProvider>
           <Header />
           <main className="max-w-screen-2xl mx-auto">{children}</main>
@@ -38,6 +51,7 @@ export default function RootLayout({
         </CartProvider>
       </body>
     </html>
+  </ClerkProvider>
   );
 }
 

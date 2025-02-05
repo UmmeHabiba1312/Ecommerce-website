@@ -4,20 +4,14 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BsExclamationCircle } from 'react-icons/bs';
-import { FaCheck } from 'react-icons/fa';
+import { FaCheck, FaRegUser } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
 import { GiHamburgerMenu } from 'react-icons/gi';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Inter } from 'next/font/google';
 import { useShoppingCart } from 'use-shopping-cart';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'; // Import Clerk components
+
 const inter = Inter({ subsets: ['latin'] });
 
 const Header = (props: any) => {
@@ -38,7 +32,7 @@ const Header = (props: any) => {
   ];
 
   return (
-    <main className="w-full max-w-screen-2xl mx-auto overflow-x-hidden ">
+    <main className="w-full max-w-screen-2xl mx-auto overflow-x-hidden">
       {/* First Header Part */}
       <div className="bg-[#272343] h-[45px] flex items-center justify-between px-4 lg:px-8 text-white text-sm">
         {/* Orders */}
@@ -83,24 +77,38 @@ const Header = (props: any) => {
               src='/mainLogo.png'
               alt="logo"
             />
-            <h1
-              className={`text-[26px] leading-[31px] text-[#272343] ${inter.className} font-medium`}
-            >
+            <h1 className={`text-[26px] leading-[31px] text-[#272343] ${inter.className} font-medium`}>
               Comforty
             </h1>
           </div>
         </Link>
 
-        {/* Cart */}
-        <Link href='/cart'>
-          <button className="flex gap-[12px] w-[120px] h-[44px] bg-white rounded-[4px] items-center justify-center border-[1px]">
-            <FiShoppingCart className="h-[22px] w-[22px] text-[#272343]" />
-            <span className="text-[#272343]">Cart</span>
-            <span className="h-[20px] w-[20px] bg-[#007580] text-[10px] leading-[10px] flex justify-center items-center p-2 rounded-full text-[#FFFFFF]">
-              {isClient ? cartCount || 0 : 0} {/* Display dynamic cart count */}
-            </span>
-          </button>
-        </Link>
+        {/* Cart and Sign In Buttons */}
+        <div className="flex gap-[12px] items-center">
+          {/* Cart */}
+          <Link href='/cart'>
+            <button className="flex gap-[12px] w-[120px] h-[44px] bg-white rounded-[4px] items-center justify-center border-[1px]">
+              <FiShoppingCart className="h-[22px] w-[22px] text-[#272343]" />
+              <span className="text-[#272343]">Cart</span>
+              <span className="h-[20px] w-[20px] bg-[#007580] text-[10px] leading-[10px] flex justify-center items-center p-2 rounded-full text-[#FFFFFF]">
+                {isClient ? cartCount || 0 : 0} {/* Display dynamic cart count */}
+              </span>
+            </button>
+          </Link>
+
+          {/* Sign In Button */}
+          <SignedOut>
+  <SignInButton className=" text-[#272343]  hover:text-[#007580]  flex items-center justify-center w-[25px] h-[25px]">
+    <FaRegUser className="text-1xl" />
+  </SignInButton>
+</SignedOut>
+
+
+          {/* User Button when Signed In */}
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+        </div>
       </div>
 
       {/* Third Header Part */}

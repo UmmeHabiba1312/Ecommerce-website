@@ -122,7 +122,7 @@ const ContactPage = () => {
               <FaMapMarkerAlt className="text-[#072343] text-3xl" />
               <div>
                 <p className="font-semibold text-gray-700 dark:text-gray-400">Address</p>
-                <p className="text-gray-500">123 umar TechTales Street, Tech City, TC 12345</p>
+                <p className="text-gray-500">123  TechTales Street, Tech City, TC 12345</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
